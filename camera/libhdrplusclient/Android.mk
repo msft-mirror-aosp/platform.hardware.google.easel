@@ -34,6 +34,12 @@ else
     LOCAL_SHARED_LIBRARIES += libhdrplusclientimpl
 endif
 
+LOCAL_HEADER_LIBRARIES := \
+    libsystem_headers \
+    libutils_headers
+LOCAL_EXPORT_HEADER_LIBRARY_HEADERS := \
+    libutils_headers
+
 LOCAL_C_INCLUDES += \
     $(LOCAL_PATH)/include \
     hardware/google/easel/camera/include
