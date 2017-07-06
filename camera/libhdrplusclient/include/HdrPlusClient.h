@@ -17,10 +17,12 @@
 #ifndef HDR_PLUS_CLIENT_H
 #define HDR_PLUS_CLIENT_H
 
+#include "CameraMetadata.h"
 #include "hardware/camera3.h"
 #include "HdrPlusClientListener.h"
 #include "HdrPlusTypes.h"
 
+using ::android::hardware::camera::common::V1_0::helper::CameraMetadata;
 namespace android {
 
 /**
@@ -111,12 +113,14 @@ public:
      * buffer will be returned in CaptureResult only once.
      *
      * request is a CaptureRequest containing output buffers to be filled by HDR+ service.
+     * requestMetadata is the metadata for this request.
      *
      * Returns:
      *  0:              on success.
      *  -EINVAL:        if the request is invalid such as containing invalid stream IDs.
      */
-    virtual status_t submitCaptureRequest(pbcamera::CaptureRequest *request) = 0;
+    virtual status_t submitCaptureRequest(pbcamera::CaptureRequest *request,
+            const CameraMetadata &requestMetadata) = 0;
 
     /*
      * Send an input buffer to HDR+ service. This is used when HDR+ service's input buffers come
