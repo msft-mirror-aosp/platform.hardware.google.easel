@@ -397,6 +397,28 @@ struct FrameMetadata {
 };
 
 /*
+ * RequestMetadata defines the properties for a capture request.
+ *
+ * If this structure is changed, serialization in MessengerToHdrPlusClient and deserialization in
+ * MessengerListenerFromHdrPlusService should also be updated.
+ */
+struct RequestMetadata {
+    std::array<int32_t, 4> cropRegion; // android.scaler.cropRegion (x_min, y_min, width, height)
+
+    // Check if the contents of lhs and rhs are equal. For vector and array variables, two are
+    // equal if their elements are equal at the same position.
+    bool operator==(const RequestMetadata& rhs) const {
+        return cropRegion == rhs.cropRegion;
+    }
+
+    // Convert this static metadata to a string and append it to the specified string.
+    void appendToString(std::string *strOut) const {
+        if (strOut == nullptr) return;
+        metadatautils::appendVectorOrArrayToString(strOut, "cropRegion", cropRegion);
+    }
+};
+
+/*
  * ResultMetadata defines a process frame's properties that have been modified due to processing.
  *
  * If this structure is changed, serialization in MessengerToHdrPlusClient and deserialization in
