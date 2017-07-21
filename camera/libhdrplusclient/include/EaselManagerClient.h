@@ -23,6 +23,7 @@
 
 namespace android {
 
+class EaselManagerClientListener;
 class HdrPlusClient;
 class HdrPlusClientListener;
 
@@ -58,8 +59,10 @@ public:
      * Resume Easel.
      *
      * Resume Easel from suspend mode.
+     *
+     * listener will be invoked for Easel status.
      */
-    virtual status_t resume() = 0;
+    virtual status_t resume(EaselManagerClientListener *listener) = 0;
 
     /*
      * Start MIPI with an output pixel lock rate for a camera.
@@ -124,6 +127,18 @@ private:
     // Disallow copy and assign.
     EaselManagerClient(const EaselManagerClient&) = delete;
     void operator=(const EaselManagerClient&) = delete;
+};
+
+
+/*
+ * EaselManagerClientListener defines callbacks that will be invoked by EaselManagerClient.
+ */
+class EaselManagerClientListener {
+public:
+    virtual ~EaselManagerClientListener() {};
+
+    // Invoked when Easel encountered a fatal error. Client should shut down Easel.
+    virtual void onEaselFatalError(std::string errMsg) = 0;
 };
 
 } // namespace android
