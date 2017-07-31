@@ -26,8 +26,7 @@ LOCAL_SRC_FILES :=  \
 LOCAL_SHARED_LIBRARIES := liblog
 
 # For AOSP builds, use dummy implementation.
-# Check if vendor directory exists. TODO: Check Easel specific directory once b/62427872 is fixed.
-ifeq ($(wildcard vendor/),)
+ifeq ($(wildcard vendor/google_easel),)
     LOCAL_CFLAGS += -DUSE_DUMMY_IMPL=1
 else
     LOCAL_CFLAGS += -DUSE_DUMMY_IMPL=0
