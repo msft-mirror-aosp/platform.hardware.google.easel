@@ -56,6 +56,21 @@ static status_t getRgb(uint8_t *r, uint8_t *g, uint8_t* b, uint32_t x, uint32_t 
             *b = std::min(std::max(yc + 1.772431f * uc - 0.006137f * vc, 0.0f), 255.0f);
             return OK;
         }
+        case HAL_PIXEL_FORMAT_RGB_888:
+        {
+            // Check the stream configuration has 1 plane.
+            if (streamConfig.image.planes.size() != 1) {
+                ALOGE("%s: RGB_888 should have 1 plane but it has %zu", __FUNCTION__,
+                        streamConfig.image.planes.size());
+                return BAD_VALUE;
+            }
+
+            uint32_t offset = y * streamConfig.image.planes[0].stride + x * 3;
+            *r = ((uint8_t*)buffer.data)[offset];
+            *g = ((uint8_t*)buffer.data)[offset + 1];
+            *b = ((uint8_t*)buffer.data)[offset + 2];
+            return OK;
+        }
         default:
             ALOGE("%s: Format %d is not supported.", __FUNCTION__, streamConfig.image.format);
             return BAD_VALUE;
@@ -64,7 +79,8 @@ static status_t getRgb(uint8_t *r, uint8_t *g, uint8_t* b, uint32_t x, uint32_t 
 
 status_t writePpm(const std::string &filename, const pbcamera::StreamConfiguration &streamConfig,
         const pbcamera::StreamBuffer &buffer) {
-    if (streamConfig.image.format != HAL_PIXEL_FORMAT_YCrCb_420_SP) {
+    if (streamConfig.image.format != HAL_PIXEL_FORMAT_YCrCb_420_SP &&
+            streamConfig.image.format != HAL_PIXEL_FORMAT_RGB_888) {
         ALOGE("%s: format 0x%x is not supported.", __FUNCTION__, streamConfig.image.format);
         return BAD_VALUE;
     }
