@@ -26,7 +26,7 @@ LOCAL_SRC_FILES :=  \
 LOCAL_SHARED_LIBRARIES := liblog
 
 # For AOSP builds, use dummy implementation.
-ifeq ($(wildcard vendor/google_easel/*),)
+ifeq ($(wildcard vendor/google_easel),)
     LOCAL_CFLAGS += -DUSE_DUMMY_IMPL=1
 else
     LOCAL_CFLAGS += -DUSE_DUMMY_IMPL=0
