@@ -428,12 +428,14 @@ struct ResultMetadata {
     int64_t easelTimestamp; // Easel timestamp of SOF of the base frame.
     int64_t timestamp; // android.sensor.timestamp. AP timestamp of exposure start of the base
                        // frame.
+    std::string makernote; // Obfuscated capture information.
 
     // Check if the contents of lhs and rhs are equal. For vector and array variables, two are
     // equal if their elements are equal at the same position.
     bool operator==(const ResultMetadata& rhs) const {
         return easelTimestamp == rhs.easelTimestamp &&
-               timestamp == rhs.timestamp;
+               timestamp == rhs.timestamp &&
+               makernote == rhs.makernote;
     }
 
     // Convert this static metadata to a string and append it to the specified string.
@@ -441,6 +443,7 @@ struct ResultMetadata {
         if (strOut == nullptr) return;
         metadatautils::appendValueToString(strOut, "easelTimestamp", easelTimestamp);
         metadatautils::appendValueToString(strOut, "timestamp", timestamp);
+        metadatautils::appendValueToString(strOut, "makernote", makernote.size());
     }
 };
 
