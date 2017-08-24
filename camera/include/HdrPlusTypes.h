@@ -405,12 +405,14 @@ struct FrameMetadata {
 struct RequestMetadata {
     std::array<int32_t, 4> cropRegion; // android.scaler.cropRegion (x_min, y_min, width, height)
     bool postviewEnable; // com.google.nexus.experimental2017.stats.postview_enable
+    bool continuousCapturing; // Whether to capture RAW while HDR+ processing.
 
     // Check if the contents of lhs and rhs are equal. For vector and array variables, two are
     // equal if their elements are equal at the same position.
     bool operator==(const RequestMetadata& rhs) const {
         return cropRegion == rhs.cropRegion &&
-               postviewEnable == rhs.postviewEnable;
+               postviewEnable == rhs.postviewEnable &&
+               continuousCapturing == rhs.continuousCapturing;
     }
 
     // Convert this static metadata to a string and append it to the specified string.
@@ -418,6 +420,7 @@ struct RequestMetadata {
         if (strOut == nullptr) return;
         metadatautils::appendVectorOrArrayToString(strOut, "cropRegion", cropRegion);
         metadatautils::appendValueToString(strOut, "postviewEnable", postviewEnable);
+        metadatautils::appendValueToString(strOut, "continuousCapturing", continuousCapturing);
     }
 };
 
