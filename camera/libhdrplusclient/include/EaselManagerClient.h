@@ -21,6 +21,8 @@
 #include <utils/Errors.h>
 #include <utils/Mutex.h>
 
+#define FW_VER_SIZE 16
+
 namespace android {
 
 class EaselManagerClientListener;
@@ -63,6 +65,13 @@ public:
      * listener will be invoked for Easel status.
      */
     virtual status_t resume(EaselManagerClientListener *listener) = 0;
+
+    /*
+     * Retrieve Easel firmware version.
+     *
+     * Firmware version string is added to image exif
+     */
+    virtual status_t getFwVersion(char fwVersion[FW_VER_SIZE]) = 0;
 
     /*
      * Start MIPI with an output pixel lock rate for a camera.
