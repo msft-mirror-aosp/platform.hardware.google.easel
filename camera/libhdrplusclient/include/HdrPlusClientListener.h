@@ -75,6 +75,12 @@ public:
      * apSensorTimestampNs is the AP sensor timestamp of the base frame, in nanoseconds.
      */
     virtual void onShutter(uint32_t requestId, int64_t apSensorTimestampNs) = 0;
+
+    /*
+     * Invoked when the postview for a request is ready.
+     */
+    virtual void onPostview(uint32_t requestId, std::unique_ptr<std::vector<uint8_t>> postview,
+            uint32_t width, uint32_t height, uint32_t stride, int32_t format) = 0;
 };
 
 } // namespace android
