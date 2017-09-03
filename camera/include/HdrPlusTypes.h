@@ -224,6 +224,11 @@ void appendArrayArrayToString(std::string *strOut, const char* key,
             std::array<T, SIZE> values);
 } // namespace metadatautils
 
+static const uint32_t DEBUG_PARAM_NONE                      = 0u;
+static const uint32_t DEBUG_PARAM_SAVE_GCAME_INPUT_METERING = (1u);
+static const uint32_t DEBUG_PARAM_SAVE_GCAME_INPUT_PAYLOAD  = (1u << 1);
+static const uint32_t DEBUG_PARAM_SAVE_GCAME_TEXT           = (1u << 2);
+
 /*
  * StaticMetadata defines a camera device's characteristics.
  *
@@ -253,6 +258,8 @@ struct StaticMetadata {
     std::array<int32_t, 2> shadingMapSize; // android.lens.info.shadingMapSize
     uint8_t focusDistanceCalibration; // android.lens.info.focusDistanceCalibration
 
+    uint32_t debugParams; // Use HDRPLUS_DEBUG_PARAM_*
+
     // Check if the contents of lhs and rhs are equal. For vector and array variables, two are
     // equal if their elements are equal at the same position.
     bool operator==(const StaticMetadata& rhs) const {
@@ -274,7 +281,8 @@ struct StaticMetadata {
                availableApertures == rhs.availableApertures &&
                availableFocalLengths == rhs.availableFocalLengths &&
                shadingMapSize == rhs.shadingMapSize &&
-               focusDistanceCalibration == rhs.focusDistanceCalibration;
+               focusDistanceCalibration == rhs.focusDistanceCalibration &&
+               debugParams == rhs.debugParams;
     }
 
     // Convert this static metadata to a string and append it to the specified string.
@@ -308,6 +316,7 @@ struct StaticMetadata {
         metadatautils::appendVectorOrArrayToString(strOut, "shadingMapSize", shadingMapSize);
         metadatautils::appendValueToString(strOut, "focusDistanceCalibration",
                 focusDistanceCalibration);
+        metadatautils::appendValueToString(strOut, "debugParams", debugParams);
     }
 };
 
