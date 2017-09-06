@@ -21,7 +21,7 @@
 #include <utils/Errors.h>
 #include <utils/Mutex.h>
 
-#define FW_VER_SIZE 16
+#define FW_VER_SIZE 24
 
 namespace android {
 
@@ -71,7 +71,7 @@ public:
      *
      * Firmware version string is added to image exif
      */
-    virtual status_t getFwVersion(char fwVersion[FW_VER_SIZE]) = 0;
+    virtual status_t getFwVersion(char *fwVersion) = 0;
 
     /*
      * Start MIPI with an output pixel lock rate for a camera.
