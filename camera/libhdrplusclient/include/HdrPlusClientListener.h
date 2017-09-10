@@ -77,6 +77,11 @@ public:
     virtual void onShutter(uint32_t requestId, int64_t apSensorTimestampNs) = 0;
 
     /*
+     * Invoked when Easel is ready to take another HDR+ request.
+     */
+    virtual void onNextCaptureReady(uint32_t requestId) = 0;
+
+    /*
      * Invoked when the postview for a request is ready.
      */
     virtual void onPostview(uint32_t requestId, std::unique_ptr<std::vector<uint8_t>> postview,
