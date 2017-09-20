@@ -33,7 +33,9 @@ namespace android {
  */
 class HdrPlusClient {
 public:
-    HdrPlusClient() {};
+    // HdrPlusClientListener is the listener to receive callbacks from HDR+ client. The listener
+    // must be valid during the life cycle of HdrPlusClient
+    HdrPlusClient(HdrPlusClientListener *) {};
     /*
      * The recommended way to create an HdrPlusClient instance is via
      * EaselManagerClient::openHdrPlusClientAsync() or EaselManagerClient::openHdrPlusClientAsync().
@@ -47,17 +49,12 @@ public:
      *
      * If EaselManagerClient is used to create the HdrPlusClient, it is already connected.
      *
-     * listener is the listener to receive callbacks from HDR+ client.
-     *
      * Returns:
      *  0:          on success.
      *  -EEXIST:    if it's already connected.
      *  -ENODEV:    if connecting failed due to a serious error.
      */
-    virtual status_t connect(HdrPlusClientListener *listener) = 0;
-
-    // Disconnect from HDR+ service.
-    virtual void disconnect() = 0;
+    virtual status_t connect() = 0;
 
     /*
      * Set the static metadata of current camera device.
