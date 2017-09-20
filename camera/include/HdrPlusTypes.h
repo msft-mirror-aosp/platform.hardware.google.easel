@@ -149,6 +149,10 @@ struct SensorMode {
     // Easel, this offset should be subtracted from AP timestamp.
     int64_t timestampOffsetNs;
 
+    // Sensor timestamp offset due to sensor cropping. When comparing timestamps between AP and
+    // Easel, this offset should be subtracted from AP timestamp.
+    int64_t timestampCropOffsetNs;
+
     // Sensor output format as defined in android_pixel_format.
     int format;
 
