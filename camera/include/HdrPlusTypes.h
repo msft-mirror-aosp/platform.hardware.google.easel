@@ -233,6 +233,7 @@ static const uint32_t DEBUG_PARAM_SAVE_GCAME_INPUT_METERING = (1u);
 static const uint32_t DEBUG_PARAM_SAVE_GCAME_INPUT_PAYLOAD  = (1u << 1);
 static const uint32_t DEBUG_PARAM_SAVE_GCAME_TEXT           = (1u << 2);
 static const uint32_t DEBUG_PARAM_SAVE_PROFILE              = (1u << 3);
+static const uint32_t DEBUG_PARAM_SAVE_GCAME_IPU_WATERMARK  = (1u << 4);
 
 /*
  * StaticMetadata defines a camera device's characteristics.
