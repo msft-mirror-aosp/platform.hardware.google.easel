@@ -17,10 +17,12 @@
 #ifndef HDR_PLUS_CLIENT_H
 #define HDR_PLUS_CLIENT_H
 
+#include "CameraMetadata.h"
 #include "hardware/camera3.h"
 #include "HdrPlusClientListener.h"
 #include "HdrPlusTypes.h"
 
+using ::android::hardware::camera::common::V1_0::helper::CameraMetadata;
 namespace android {
 
 /**
@@ -31,7 +33,9 @@ namespace android {
  */
 class HdrPlusClient {
 public:
-    HdrPlusClient() {};
+    // HdrPlusClientListener is the listener to receive callbacks from HDR+ client. The listener
+    // must be valid during the life cycle of HdrPlusClient
+    HdrPlusClient(HdrPlusClientListener *) {};
     /*
      * The recommended way to create an HdrPlusClient instance is via
      * EaselManagerClient::openHdrPlusClientAsync() or EaselManagerClient::openHdrPlusClientAsync().
@@ -45,17 +49,12 @@ public:
      *
      * If EaselManagerClient is used to create the HdrPlusClient, it is already connected.
      *
-     * listener is the listener to receive callbacks from HDR+ client.
-     *
      * Returns:
      *  0:          on success.
      *  -EEXIST:    if it's already connected.
      *  -ENODEV:    if connecting failed due to a serious error.
      */
-    virtual status_t connect(HdrPlusClientListener *listener) = 0;
-
-    // Disconnect from HDR+ service.
-    virtual void disconnect() = 0;
+    virtual status_t connect() = 0;
 
     /*
      * Set the static metadata of current camera device.
@@ -111,12 +110,14 @@ public:
      * buffer will be returned in CaptureResult only once.
      *
      * request is a CaptureRequest containing output buffers to be filled by HDR+ service.
+     * requestMetadata is the metadata for this request.
      *
      * Returns:
      *  0:              on success.
      *  -EINVAL:        if the request is invalid such as containing invalid stream IDs.
      */
-    virtual status_t submitCaptureRequest(pbcamera::CaptureRequest *request) = 0;
+    virtual status_t submitCaptureRequest(pbcamera::CaptureRequest *request,
+            const CameraMetadata &requestMetadata) = 0;
 
     /*
      * Send an input buffer to HDR+ service. This is used when HDR+ service's input buffers come
