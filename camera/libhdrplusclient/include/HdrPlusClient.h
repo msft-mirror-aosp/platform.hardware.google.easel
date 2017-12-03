@@ -143,6 +143,12 @@ public:
     virtual void notifyFrameMetadata(uint32_t frameNumber, const camera_metadata_t &resultMetadata,
             bool lastMetadata=true) = 0;
 
+    /*
+     * Notify Easel has encountered a fatal error and HDR+ client should stop sending messages
+     * to Easel.
+     */
+    virtual void nofityEaselFatalError() = 0;
+
 private:
     // Disallow copy and assign.
     HdrPlusClient(const HdrPlusClient&) = delete;
