@@ -149,6 +149,10 @@ struct SensorMode {
     // Easel, this offset should be subtracted from AP timestamp.
     int64_t timestampOffsetNs;
 
+    // Sensor timestamp offset due to sensor cropping. When comparing timestamps between AP and
+    // Easel, this offset should be subtracted from AP timestamp.
+    int64_t timestampCropOffsetNs;
+
     // Sensor output format as defined in android_pixel_format.
     int format;
 
@@ -224,6 +228,11 @@ void appendArrayArrayToString(std::string *strOut, const char* key,
             std::array<T, SIZE> values);
 } // namespace metadatautils
 
+static const uint32_t DEBUG_PARAM_NONE                      = 0u;
+static const uint32_t DEBUG_PARAM_SAVE_GCAME_INPUT_METERING = (1u);
+static const uint32_t DEBUG_PARAM_SAVE_GCAME_INPUT_PAYLOAD  = (1u << 1);
+static const uint32_t DEBUG_PARAM_SAVE_GCAME_TEXT           = (1u << 2);
+
 /*
  * StaticMetadata defines a camera device's characteristics.
  *
@@ -252,30 +261,10 @@ struct StaticMetadata {
     std::vector<float> availableFocalLengths; // android.lens.info.availableFocalLengths
     std::array<int32_t, 2> shadingMapSize; // android.lens.info.shadingMapSize
     uint8_t focusDistanceCalibration; // android.lens.info.focusDistanceCalibration
+    std::array<int32_t, 2> aeCompensationRange; // android.control.aeCompensationRange
+    float aeCompensationStep; // android.control.aeCompensationStep
 
-    // Check if the contents of lhs and rhs are equal. For vector and array variables, two are
-    // equal if their elements are equal at the same position.
-    bool operator==(const StaticMetadata& rhs) const {
-        return flashInfoAvailable == rhs.flashInfoAvailable &&
-               sensitivityRange == rhs.sensitivityRange &&
-               maxAnalogSensitivity == rhs.maxAnalogSensitivity &&
-               pixelArraySize == rhs.pixelArraySize &&
-               activeArraySize == rhs.activeArraySize &&
-               opticalBlackRegions == rhs.opticalBlackRegions &&
-               availableStreamConfigurations == rhs.availableStreamConfigurations &&
-               referenceIlluminant1 == rhs.referenceIlluminant1 &&
-               referenceIlluminant2 == rhs.referenceIlluminant2 &&
-               calibrationTransform1 == rhs.calibrationTransform1 &&
-               calibrationTransform2 == rhs.calibrationTransform2 &&
-               colorTransform1 == rhs.colorTransform1 &&
-               colorTransform2 == rhs.colorTransform2 &&
-               whiteLevel == rhs.whiteLevel &&
-               colorFilterArrangement == rhs.colorFilterArrangement &&
-               availableApertures == rhs.availableApertures &&
-               availableFocalLengths == rhs.availableFocalLengths &&
-               shadingMapSize == rhs.shadingMapSize &&
-               focusDistanceCalibration == rhs.focusDistanceCalibration;
-    }
+    uint32_t debugParams; // Use HDRPLUS_DEBUG_PARAM_*
 
     // Convert this static metadata to a string and append it to the specified string.
     void appendToString(std::string *strOut) const {
@@ -308,6 +297,11 @@ struct StaticMetadata {
         metadatautils::appendVectorOrArrayToString(strOut, "shadingMapSize", shadingMapSize);
         metadatautils::appendValueToString(strOut, "focusDistanceCalibration",
                 focusDistanceCalibration);
+        metadatautils::appendVectorOrArrayToString(strOut, "aeCompensationRange",
+                aeCompensationRange);
+        metadatautils::appendValueToString(strOut, "aeCompensationStep",
+                aeCompensationStep);
+        metadatautils::appendValueToString(strOut, "debugParams", debugParams);
     }
 };
 
@@ -340,31 +334,12 @@ struct FrameMetadata {
     std::array<float, 4> dynamicBlackLevel; // android.sensor.dynamicBlackLevel
     std::vector<float> lensShadingMap; // android.statistics.lensShadingMap
     float focusDistance; // android.lens.focusDistance
-
-    // Check if the contents of lhs and rhs are equal. For vector and array variables, two are
-    // equal if their elements are equal at the same position.
-    bool operator==(const FrameMetadata& rhs) const {
-        return easelTimestamp == rhs.easelTimestamp &&
-               exposureTime == rhs.exposureTime &&
-               sensitivity == rhs.sensitivity &&
-               postRawSensitivityBoost == rhs.postRawSensitivityBoost &&
-               flashMode == rhs.flashMode &&
-               colorCorrectionGains == rhs.colorCorrectionGains &&
-               colorCorrectionTransform == rhs.colorCorrectionTransform &&
-               neutralColorPoint == rhs.neutralColorPoint &&
-               timestamp == rhs.timestamp &&
-               blackLevelLock == rhs.blackLevelLock &&
-               faceDetectMode == rhs.faceDetectMode &&
-               faceIds == rhs.faceIds &&
-               faceLandmarks == rhs.faceLandmarks &&
-               faceRectangles == rhs.faceRectangles &&
-               faceScores == rhs.faceScores &&
-               sceneFlicker == rhs.sceneFlicker &&
-               noiseProfile == rhs.noiseProfile &&
-               dynamicBlackLevel == rhs.dynamicBlackLevel &&
-               lensShadingMap == rhs.lensShadingMap &&
-               focusDistance == rhs.focusDistance;
-    }
+    int32_t aeExposureCompensation; // android.control.aeExposureCompensation
+    uint8_t aeMode; // android.control.aeMode
+    uint8_t aeLock; // android.control.aeLock
+    uint8_t aeState; // android.control.aeState
+    uint8_t aePrecaptureTrigger; // android.control.aePrecaptureTrigger
+    std::vector<std::array<int32_t, 5>> aeRegions; // android.control.aeRegions
 
     // Convert this static metadata to a string and append it to the specified string.
     void appendToString(std::string *strOut) const {
@@ -393,6 +368,35 @@ struct FrameMetadata {
         metadatautils::appendVectorOrArrayToString(strOut, "dynamicBlackLevel", dynamicBlackLevel);
         metadatautils::appendVectorOrArrayToString(strOut, "lensShadingMap", lensShadingMap);
         metadatautils::appendValueToString(strOut, "focusDistance", focusDistance);
+        metadatautils::appendValueToString(strOut, "aeExposureCompensation", aeExposureCompensation);
+        metadatautils::appendValueToString(strOut, "aeMode", aeMode);
+        metadatautils::appendValueToString(strOut, "aeLock", aeLock);
+        metadatautils::appendValueToString(strOut, "aeState", aeState);
+        metadatautils::appendValueToString(strOut, "aePrecaptureTrigger", aePrecaptureTrigger);
+        metadatautils::appendVectorArrayToString(strOut, "aeRegions", aeRegions);
+    }
+};
+
+/*
+ * RequestMetadata defines the properties for a capture request.
+ *
+ * If this structure is changed, serialization in MessengerToHdrPlusClient and deserialization in
+ * MessengerListenerFromHdrPlusService should also be updated.
+ */
+struct RequestMetadata {
+    std::array<int32_t, 4> cropRegion; // android.scaler.cropRegion (x_min, y_min, width, height)
+    int32_t aeExposureCompensation; // android.control.aeExposureCompensation
+
+    bool postviewEnable; // com.google.nexus.experimental2017.stats.postview_enable
+    bool continuousCapturing; // Whether to capture RAW while HDR+ processing.
+
+    // Convert this static metadata to a string and append it to the specified string.
+    void appendToString(std::string *strOut) const {
+        if (strOut == nullptr) return;
+        metadatautils::appendVectorOrArrayToString(strOut, "cropRegion", cropRegion);
+        metadatautils::appendValueToString(strOut, "aeExposureCompensation", aeExposureCompensation);
+        metadatautils::appendValueToString(strOut, "postviewEnable", postviewEnable);
+        metadatautils::appendValueToString(strOut, "continuousCapturing", continuousCapturing);
     }
 };
 
@@ -406,19 +410,14 @@ struct ResultMetadata {
     int64_t easelTimestamp; // Easel timestamp of SOF of the base frame.
     int64_t timestamp; // android.sensor.timestamp. AP timestamp of exposure start of the base
                        // frame.
-
-    // Check if the contents of lhs and rhs are equal. For vector and array variables, two are
-    // equal if their elements are equal at the same position.
-    bool operator==(const ResultMetadata& rhs) const {
-        return easelTimestamp == rhs.easelTimestamp &&
-               timestamp == rhs.timestamp;
-    }
+    std::string makernote; // Obfuscated capture information.
 
     // Convert this static metadata to a string and append it to the specified string.
     void appendToString(std::string *strOut) const {
         if (strOut == nullptr) return;
         metadatautils::appendValueToString(strOut, "easelTimestamp", easelTimestamp);
         metadatautils::appendValueToString(strOut, "timestamp", timestamp);
+        metadatautils::appendValueToString(strOut, "makernote", makernote.size());
     }
 };
 
