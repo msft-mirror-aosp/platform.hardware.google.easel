@@ -41,13 +41,13 @@ LOCAL_EXPORT_HEADER_LIBRARY_HEADERS := \
 
 LOCAL_C_INCLUDES += \
     $(LOCAL_PATH)/include \
-    hardware/google/easel/camera/include
+    hardware/google/easel/amber/camera/include
 
 LOCAL_CFLAGS += -Wall -Wextra -Werror
 
 LOCAL_EXPORT_C_INCLUDE_DIRS += \
     $(LOCAL_PATH)/include \
-    hardware/google/easel/camera/include
+    hardware/google/easel/amber/camera/include
 
 LOCAL_MODULE:= libhdrplusclient
 LOCAL_PROPRIETARY_MODULE := true
