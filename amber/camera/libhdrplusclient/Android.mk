@@ -29,8 +29,12 @@ LOCAL_SHARED_LIBRARIES := liblog
 ifeq ($(wildcard vendor/google_easel),)
     LOCAL_CFLAGS += -DUSE_DUMMY_IMPL=1
 else
+ifneq ($(TARGET_EASEL_VARIANT), amber)
+    LOCAL_CFLAGS += -DUSE_DUMMY_IMPL=1
+else
     LOCAL_CFLAGS += -DUSE_DUMMY_IMPL=0
     LOCAL_SHARED_LIBRARIES += libhdrplusclientimpl
+endif
 endif
 
 LOCAL_HEADER_LIBRARIES := \
