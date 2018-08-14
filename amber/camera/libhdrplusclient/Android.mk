@@ -29,8 +29,12 @@ LOCAL_SHARED_LIBRARIES := liblog
 ifeq ($(wildcard vendor/google_easel),)
     LOCAL_CFLAGS += -DUSE_DUMMY_IMPL=1
 else
+ifneq ($(TARGET_EASEL_VARIANT), amber)
+    LOCAL_CFLAGS += -DUSE_DUMMY_IMPL=1
+else
     LOCAL_CFLAGS += -DUSE_DUMMY_IMPL=0
     LOCAL_SHARED_LIBRARIES += libhdrplusclientimpl
+endif
 endif
 
 LOCAL_HEADER_LIBRARIES := \
@@ -41,13 +45,13 @@ LOCAL_EXPORT_HEADER_LIBRARY_HEADERS := \
 
 LOCAL_C_INCLUDES += \
     $(LOCAL_PATH)/include \
-    hardware/google/easel/camera/include
+    hardware/google/easel/amber/camera/include
 
 LOCAL_CFLAGS += -Wall -Wextra -Werror
 
 LOCAL_EXPORT_C_INCLUDE_DIRS += \
     $(LOCAL_PATH)/include \
-    hardware/google/easel/camera/include
+    hardware/google/easel/amber/camera/include
 
 LOCAL_MODULE:= libhdrplusclient
 LOCAL_PROPRIETARY_MODULE := true
